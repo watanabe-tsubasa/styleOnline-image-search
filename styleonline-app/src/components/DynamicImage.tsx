@@ -27,7 +27,7 @@ const DynamicImage: React.FC<DynamicImageProps> = ({
   const [isPlaceholder, setIsPlaceholder] = useState<boolean>(false);
 
   useEffect(() => {
-    setImgSrc(janCode === '' ? '/startimage.png' : `Contents/ProductImages/0/P-${janCode}01_LL.jpg`);
+    setImgSrc(janCode === '' ? '/startimage.png' : `Contents/ProductImages/0/P-${janCode}01_LL.jpg`)
     setIsPlaceholder(false);
   }, [janCode]);
 

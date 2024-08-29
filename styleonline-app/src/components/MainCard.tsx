@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -27,22 +27,15 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import Image, { ImageLoader } from "next/image"
+import Image from "next/image"
 import { BarcodeReader } from "./BarcodeReader"
 import DynamicImage from "./DynamicImage"
-
-// ダミーの画像検索結果
-
+import { GoogleCustomImageSearchResponse } from "@/types/imageSearchTypes"
 interface searchResultsType {
   id: number;
   url: string;
   alt: string;
 }
-const dummySearchResults = [
-  { id: 1, url: "/placeholder.svg", alt: "検索結果1" },
-  { id: 2, url: "/placeholder.svg", alt: "検索結果2" },
-  { id: 3, url: "/placeholder.svg", alt: "検索結果3" },
-]
 
 export default function MainCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -50,12 +43,36 @@ export default function MainCard() {
   const [searchResults, setSearchResults] = useState<searchResultsType[]>([])
   const [janCode, setJanCode] = useState("")
 
-  const handleSearch = () => {
-    // 実際のアプリケーションでは、ここでAPIを呼び出します
-    // この例では、ダミーデータを使用しています
-    setSearchResults(dummySearchResults)
+  const handleSearch = async () => {
+    const res = await gsearchFetcher();
+    const searchResults = res.items.map((elem, idx) => (
+      {
+        id: idx,
+        url: elem.link,
+        alt: elem.title,
+      }
+    ))
+    setSearchResults(searchResults)
     setIsDrawerOpen(true)
   }
+
+  const gsearchFetcher = async () => {
+    const res = await fetch('/api/gsearch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "query": janCode })
+    });
+    const data: GoogleCustomImageSearchResponse = await res.json();
+    console.log(data.queries.request)
+    console.log(data.items)
+    return data
+  }
+
+  useEffect(() => {
+    console.log(searchResults);
+  }, [searchResults])
   
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 space-y-4">
@@ -70,12 +87,12 @@ export default function MainCard() {
             value={janCode}
             onChange={(e) => setJanCode(e.target.value)}
           />
-            <DynamicImage
-              janCode={janCode}
-              width={400}
-              height={400}
-              altText="商品画像"
-            />
+          <DynamicImage
+            janCode={janCode}
+            width={400}
+            height={400}
+            altText="商品画像"
+          />
         </CardContent>
       </Card>
 
@@ -114,7 +131,7 @@ export default function MainCard() {
           </DrawerHeader>
           <div className="grid grid-cols-2 gap-4 p-4">
             {searchResults.map((result) => (
-              <Image
+              <img
                 key={result.id}
                 src={result.url}
                 alt={result.alt}
