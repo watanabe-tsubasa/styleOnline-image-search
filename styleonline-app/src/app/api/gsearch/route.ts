@@ -5,14 +5,29 @@ interface gsearchPOSTBody {
   query: string;
 }
 
-export async function POST(req: NextRequest) {
+interface gsearchMapper {
+  id: number;
+  url: string;
+  alt: string;
+}
+
+export type gsearchAPIResponse = gsearchMapper[] | { message: string; error: string };
+
+export async function POST(req: NextRequest): Promise<NextResponse<gsearchAPIResponse>> {
   const apiURL = process.env.API_URL || '';
   try {
     const query = await req.json() as gsearchPOSTBody
     const fetchURL = `${apiURL}&q=${query.query}`
     const res = await fetch(fetchURL);
-    const data: GoogleCustomImageSearchResponse = await res.json()
-    return NextResponse.json(data);
+    const data: GoogleCustomImageSearchResponse = await res.json();
+    const result = data.items.map((elem, idx) => (
+      {
+        id: idx,
+        url: elem.link,
+        alt: elem.title,
+      }
+    ))
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error reading body:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);

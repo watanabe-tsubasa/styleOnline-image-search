@@ -9,6 +9,7 @@ interface BarcodeReaderProps {
   setIsScanning: React.Dispatch<React.SetStateAction<boolean>>;
   open: boolean;
   setOpen: React.Dispatch<SetStateAction<boolean>>
+  isQRMode: boolean;
 }
 
 export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
@@ -16,28 +17,60 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
   isScanning,
   setIsScanning,
   open,
-  setOpen
+  setOpen,
+  isQRMode
 }) => {
   const webcamRef = useRef<Webcam>(null);
+  const getJANfromURL = (url: string) => {
+    const regex = /\d{13}/;
+    const match = url.match(regex);
+
+    if (match) {
+        return match[0]
+    } else {
+        return 'QRに誤りがあるかもしれません。手入力してください。'
+    }
+  }
+
+  const readerStyle = isQRMode ? 
+  'flex items-center w-full w-32 h-32':
+  'flex items-center w-full h-32 overflow-hidden';
 
   useEffect(() => {
     const codeReader = new BrowserMultiFormatReader();
 
     const decode = async () => {
       if (!webcamRef.current || !isScanning) return;
-
       const imageSrc = webcamRef.current.getScreenshot();
-      if (imageSrc) {
-        try {
-          const result = await codeReader.decodeFromImage(undefined, imageSrc);
-          if (result) {
-            setBarcode(result.getText());
-            setIsScanning(false);  // バーコードを検出したらスキャンを停止
-          }
-        } catch (error) {
-          // console.log(error)
-        }
+      if (!imageSrc) return;
+      try {
+        const result = await codeReader.decodeFromImage(undefined, imageSrc);
+        if (!result) return;      
+        let text = result.getText();
+        if (isQRMode) text = getJANfromURL(text);
+        
+        setBarcode(text);
+        setIsScanning(false);  // バーコードを検出したらスキャンを停止
+        
+      } catch (error) {
+        // console.log(error)
       }
+      
+      // if (imageSrc) {
+      //   try {
+      //     const result = await codeReader.decodeFromImage(undefined, imageSrc);
+      //     if (result) {
+      //       let text = result.getText();
+      //       if (isQRMode) {
+      //         text = getJANfromURL(text);
+      //       }
+      //       setBarcode(result.getText());
+      //       setIsScanning(false);  // バーコードを検出したらスキャンを停止
+      //     }
+      //   } catch (error) {
+      //     // console.log(error)
+      //   }
+      // }
 
       if (isScanning) {
         requestAnimationFrame(decode);  // 画面更新のたびにデコードを試みる
@@ -54,8 +87,8 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
   }, [isScanning, setBarcode, setIsScanning]);
 
   return (
-    <div className='flex flex-col space-y-4'>
-      <div className='flex items-center w-full h-32 overflow-hidden '>
+    <div className='flex flex-col space-y-4 items-center'>
+      <div className={readerStyle}>
         <Webcam
           className='w-auto'
           audio={false}

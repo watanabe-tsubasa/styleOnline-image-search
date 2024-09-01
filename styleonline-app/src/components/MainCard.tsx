@@ -27,10 +27,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import Image from "next/image"
-import { BarcodeReader } from "./BarcodeReader"
-import DynamicImage from "./DynamicImage"
-import { GoogleCustomImageSearchResponse } from "@/types/imageSearchTypes"
+import { BarcodeReader } from "@/components/BarcodeReader"
+import DynamicImage from "@/components/DynamicImage"
+import { gsearchAPIResponse } from "@/app/api/gsearch/route"
+import { CommonDialog } from "@/components/CommonDialog"
+import { CommonDrawer } from "@/components/CommonDrawer"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "./ui/label"
 interface searchResultsType {
   id: number;
   url: string;
@@ -40,19 +43,25 @@ interface searchResultsType {
 export default function MainCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isDrawerModalOpen, setIsDrawerModalOpen] = useState(false)
   const [searchResults, setSearchResults] = useState<searchResultsType[]>([])
   const [janCode, setJanCode] = useState("")
+  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [isQRMode, setIsQRMode] = useState<boolean>(false);
+  
+  const target = isQRMode ? 'QRコード': 'JANコード';
 
   const handleSearch = async () => {
+    setStatusMessage('');
+    setSearchResults([]);
     const res = await gsearchFetcher();
-    const searchResults = res.items.map((elem, idx) => (
-      {
-        id: idx,
-        url: elem.link,
-        alt: elem.title,
-      }
-    ))
-    setSearchResults(searchResults)
+    if ('error' in res) {
+      console.error(res.error);
+      setStatusMessage('ネットワークエラーが発生しました。再度検索してください');
+    } else {
+      setStatusMessage('画像をクリックして拡大表示が可能です。');
+      setSearchResults(res)
+    }
     setIsDrawerOpen(true)
   }
 
@@ -64,9 +73,8 @@ export default function MainCard() {
       },
       body: JSON.stringify({ "query": janCode })
     });
-    const data: GoogleCustomImageSearchResponse = await res.json();
-    console.log(data.queries.request)
-    console.log(data.items)
+    const data: gsearchAPIResponse = await res.json();
+    console.log(data)
     return data
   }
 
@@ -78,7 +86,17 @@ export default function MainCard() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 space-y-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>商品画像確認アプリ</CardTitle>
+          <div className="flex">
+            <CardTitle className="flex flex-grow items-center">商品画像確認アプリ</CardTitle>
+            <div className="flex flex-col items-center">
+              <Switch
+                id="QRmode"
+                checked={isQRMode}
+                onCheckedChange={setIsQRMode}
+              />
+              <Label htmlFor="QRmode">QRMode</Label>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input
@@ -96,17 +114,13 @@ export default function MainCard() {
         </CardContent>
       </Card>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline">JANコードをスキャン</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>JANコードスキャン</DialogTitle>
-            <DialogDescription>
-              JANコードをスキャンしてください
-            </DialogDescription>
-          </DialogHeader>
+      <CommonDialog
+        dialogTitle={`${target}をスキャン`}
+        dialogDescription={`${target}をスキャンしてください`}
+        dialogTrigger={<Button variant="outline">{`${target}をスキャン`}</Button>}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        dialogChildren={
           <div>
             <BarcodeReader 
               setBarcode={setJanCode}
@@ -114,23 +128,22 @@ export default function MainCard() {
               setIsScanning={setIsModalOpen}
               open={isModalOpen}
               setOpen={setIsModalOpen}
+              isQRMode={isQRMode}
             />
           </div>
-          <Button onClick={() => setIsModalOpen(false)}>閉じる</Button>
-        </DialogContent>
-      </Dialog>
+        }
+      />
 
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <DrawerTrigger asChild>
-          <Button onClick={handleSearch}>画像を検索</Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>画像検索結果</DrawerTitle>
-            <DrawerDescription>Google Search APIの検索結果</DrawerDescription>
-          </DrawerHeader>
-          <div className="grid grid-cols-2 gap-4 p-4">
-            {searchResults.map((result) => (
+      <CommonDrawer
+        drawerTitle="画像検索結果"
+        drawerDescription="Google 画像検索結果"
+        drawerTrigger={<Button onClick={handleSearch}>画像を検索</Button>}
+        isDrawerOpen={isDrawerOpen}
+        setIsDrawerOpen={setIsDrawerOpen}
+        statusMessage={statusMessage}
+        drawerChildren={
+          searchResults.map((result) => (
+            <div>
               <img
                 key={result.id}
                 src={result.url}
@@ -139,15 +152,10 @@ export default function MainCard() {
                 height={150}
                 className="rounded-md"
               />
-            ))}
-          </div>
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button variant="outline">閉じる</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+            </div>
+          ))
+        }
+      />
     </div>
   )
 }
