@@ -31,7 +31,7 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
         return 'QRに誤りがあるかもしれません。手入力してください。'
     }
   }
-  const scanStyle = isQRMode ? 'flex items-center w-32 h-32 overflow-hidden': 'flex items-center w-full h-32 overflow-hidden'
+  const scanStyle = isQRMode ? 'relative w-32 h-32 overflow-hidden: 'relative w-full h-32 overflow-hidden'
   useEffect(() => {
     const codeReader = new BrowserMultiFormatReader();
 
@@ -85,7 +85,7 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
     <div className='flex flex-col space-y-4 items-center justify-center'>
       <div className={scanStyle}>
         <Webcam
-          className='w-auto'
+          className='absolute inset-0 w-full h-full object-cover'
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
