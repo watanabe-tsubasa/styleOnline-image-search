@@ -1,5 +1,5 @@
-import { GoogleCustomImageSearchResponse } from '@/types/imageSearchTypes';
 import { NextRequest, NextResponse } from 'next/server';
+import { GoogleCustomImageSearchResponse } from '@/types/imageSearchTypes';
 
 interface gsearchMapper {
   id: number;
@@ -8,25 +8,29 @@ interface gsearchMapper {
 }
 
 export type gsearchAPIResponse = gsearchMapper[];
-// export type gsearchAPIResponse = gsearchMapper[] | { message: string; error: string };
 
-export async function GET(req: NextRequest): Promise<NextResponse<gsearchAPIResponse>> {
+export async function POST(req: NextRequest): Promise<NextResponse<gsearchAPIResponse>> {
   const apiURL = process.env.API_URL || '';
-  try {
-    const { searchParams } = new URL(req.url);
-    const query = searchParams.get('query') || '';
-    console.log(query);
 
-    const fetchURL = `${apiURL}&q=${query}`;
+  try {
+    const { query } = await req.json();  // リクエストボディから `query` を取得
+
+    if (!query) {
+      throw new Error('Query parameter is missing');
+    }
+
+    const fetchURL = `${apiURL}&q=${encodeURIComponent(query)}`;
     const res = await fetch(fetchURL);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch data from external API: ${res.statusText}`);
+    }
+
     const data: GoogleCustomImageSearchResponse = await res.json();
-    const result = data.items.map((elem, idx) => (
-      {
-        id: idx,
-        url: elem.link,
-        alt: elem.title,
-      }
-    ));
+    const result = data.items.map((elem, idx) => ({
+      id: idx,
+      url: elem.link,
+      alt: elem.title,
+    }));
 
     return NextResponse.json(result);
   } catch (error) {
