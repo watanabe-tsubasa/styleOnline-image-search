@@ -60,7 +60,7 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
             if (isQRMode) {
               text = getJANfromURL(text);
             }
-            setBarcode(result.getText());
+            setBarcode(text);
             setIsScanning(false);  // バーコードを検出したらスキャンを停止
           }
         } catch (error) {
