@@ -31,7 +31,7 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
         return 'QRに誤りがあるかもしれません。手入力してください。'
     }
   }
-
+  const scanStyle = isQRMode ? 'flex items-center w-full': 'flex items-center w-full h-32 overflow-hidden'
   useEffect(() => {
     const codeReader = new BrowserMultiFormatReader();
 
@@ -67,8 +67,6 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
           // console.log(error)
         }
       }
-      const scanStyle = isQRMode ? 'flex items-center w-full': 'flex items-center w-full h-32 overflow-hidden'
-
       if (isScanning) {
         requestAnimationFrame(decode);  // 画面更新のたびにデコードを試みる
       }
