@@ -15,7 +15,7 @@ interface CommonDialogProps {
   dialogTrigger?: ReactNode;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<SetStateAction<boolean>>;
-  dialogChildren: ReactNode
+  children?: ReactNode
 }
 
 export const CommonDialog: React.FC<CommonDialogProps> = ({
@@ -24,7 +24,7 @@ export const CommonDialog: React.FC<CommonDialogProps> = ({
   dialogTrigger,
   isModalOpen,
   setIsModalOpen,
-  dialogChildren,
+  children,
 }) => {
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -39,7 +39,7 @@ export const CommonDialog: React.FC<CommonDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div>
-          {dialogChildren}
+          {children}
         </div>
         <Button onClick={() => setIsModalOpen(false)}>閉じる</Button>
       </DialogContent>

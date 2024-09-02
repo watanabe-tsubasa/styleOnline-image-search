@@ -17,8 +17,8 @@ interface CommonDrawerProps {
   drawerTrigger?: ReactNode;
   isDrawerOpen: boolean;
   setIsDrawerOpen: React.Dispatch<SetStateAction<boolean>>;
-  drawerChildren: ReactNode;
   statusMessage?: string;
+  children?: ReactNode;
 }
 
 export const CommonDrawer: React.FC<CommonDrawerProps> = ({
@@ -27,8 +27,8 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
   drawerTrigger,
   isDrawerOpen,
   setIsDrawerOpen,
-  drawerChildren,
   statusMessage,
+  children,
 }) => {
   return (
     <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -43,7 +43,7 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
             <p className="text-red-800">{statusMessage}</p>
           </div>
         )}
-        <div className="grid grid-cols-2 gap-4 p-4">{drawerChildren}</div>
+        <div>{children}</div>
         <DrawerFooter>
           <DrawerClose asChild>
             <Button variant="outline">閉じる</Button>
