@@ -15,7 +15,7 @@ interface CommonDialogProps {
   dialogTrigger?: ReactNode;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<SetStateAction<boolean>>;
-  children: ReactNode
+  children?: ReactNode
 }
 
 export const CommonDialog: React.FC<CommonDialogProps> = ({

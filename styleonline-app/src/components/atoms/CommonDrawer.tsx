@@ -18,7 +18,7 @@ interface CommonDrawerProps {
   isDrawerOpen: boolean;
   setIsDrawerOpen: React.Dispatch<SetStateAction<boolean>>;
   statusMessage?: string;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export const CommonDrawer: React.FC<CommonDrawerProps> = ({
@@ -43,7 +43,7 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
             <p className="text-red-800">{statusMessage}</p>
           </div>
         )}
-        <div className="grid grid-cols-2 gap-4 p-4">{children}</div>
+        <div>{children}</div>
         <DrawerFooter>
           <DrawerClose asChild>
             <Button variant="outline">閉じる</Button>

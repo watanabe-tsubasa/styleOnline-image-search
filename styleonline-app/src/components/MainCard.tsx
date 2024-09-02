@@ -1,89 +1,31 @@
 "use client"
 
-import { Suspense, lazy, useEffect, useState } from "react"
+import { Suspense, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import { BarcodeReader } from "@/components/BarcodeReader"
-import DynamicImage from "@/components/DynamicImage"
-import { gsearchAPIResponse } from "@/app/api/gsearch/route"
-import { CommonDialog } from "@/components/CommonDialog"
-import { CommonDrawer } from "@/components/CommonDrawer"
+import { BarcodeReader } from "@/components/atoms/BarcodeReader"
+import { DynamicImage } from "@/components/atoms/DynamicImage"
+import { CommonDialog } from "@/components/atoms/CommonDialog"
+import { CommonDrawer } from "@/components/atoms/CommonDrawer"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "./ui/label"
+import { SearchDrawerBody } from "./SearchDrawerBody"
 import { Skeleton } from "./ui/skeleton"
-const LazyImage = lazy(() => import('@/components/LazyImage'))
-interface searchResultsType {
-  id: number;
-  url: string;
-  alt: string;
-}
 
 export default function MainCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isDrawerModalOpen, setIsDrawerModalOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState<searchResultsType[]>([])
   const [janCode, setJanCode] = useState("")
-  const [statusMessage, setStatusMessage] = useState<string>('');
   const [isQRMode, setIsQRMode] = useState<boolean>(true);
   
   const target = isQRMode ? 'QRコード': 'JANコード';
 
-  const handleSearch = async () => {
-    setStatusMessage('');
-    setSearchResults([]);
-    const res = await gsearchFetcher();
-    if ('error' in res) {
-      console.error(res.error);
-      setStatusMessage('ネットワークエラーが発生しました。再度検索してください');
-    } else {
-      setStatusMessage('画像をクリックして拡大表示が可能です。');
-      setSearchResults(res)
-    }
-    setIsDrawerOpen(true)
-  }
-
-  const gsearchFetcher = async () => {
-    const res = await fetch('/api/gsearch', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ "query": janCode })
-    });
-    const data: gsearchAPIResponse = await res.json();
-    console.log(data)
-    return data
-  }
-
-  useEffect(() => {
-    console.log(searchResults);
-  }, [searchResults])
-  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 space-y-4">
       <Card className="w-full max-w-md">
@@ -138,22 +80,26 @@ export default function MainCard() {
       <CommonDrawer
         drawerTitle="画像検索結果"
         drawerDescription="Google 画像検索結果"
-        drawerTrigger={<Button onClick={handleSearch}>画像を検索</Button>}
+        drawerTrigger={
+          <Button disabled={janCode.length === 0}>
+            画像を検索
+          </Button>
+        }
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
-        statusMessage={statusMessage}
       >
-        {searchResults.map((result) => (
-          <div key={result.id}>
-            <Suspense fallback={<Skeleton className="rounded-md aspect-square" />}>
-              <LazyImage
-                src={result.url}
-                alt={result.alt}
-              />
-            </Suspense>
+        <Suspense fallback={
+          <div className="grid grid-cols-2 gap-4 p-4">
+            <Skeleton className="rounded-md aspect-square" />
+            <Skeleton className="rounded-md aspect-square" />
+            <Skeleton className="rounded-md aspect-square" />
+            <Skeleton className="rounded-md aspect-square" />
           </div>
-          ))
-        }
+          }
+        >
+          
+          <SearchDrawerBody query={janCode} />
+        </Suspense>
       </CommonDrawer>
     </div>
   )

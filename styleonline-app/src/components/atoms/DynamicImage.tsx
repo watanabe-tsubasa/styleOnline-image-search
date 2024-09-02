@@ -15,7 +15,7 @@ const myLoader: ImageLoader = ({ src, width, quality }) => {
   return `https://img.aeonretail.com/${src}?w=${width}&q=${quality || 75}`;
 };
 
-const DynamicImage: React.FC<DynamicImageProps> = ({ 
+export const DynamicImage: React.FC<DynamicImageProps> = ({ 
   janCode, 
   width, 
   height, 
@@ -52,5 +52,3 @@ const DynamicImage: React.FC<DynamicImageProps> = ({
     />
   );
 };
-
-export default DynamicImage;
