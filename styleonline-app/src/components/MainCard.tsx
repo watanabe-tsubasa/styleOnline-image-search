@@ -144,13 +144,14 @@ export default function MainCard() {
         statusMessage={statusMessage}
       >
         {searchResults.map((result) => (
-          <Suspense fallback={<Skeleton className="rounded-md aspect-square" />}>
-            <LazyImage
-             key={result.id}
-             src={result.url}
-             alt={result.alt}
-            />
-          </Suspense>
+          <div key={result.id}>
+            <Suspense fallback={<Skeleton className="rounded-md aspect-square" />}>
+              <LazyImage
+                src={result.url}
+                alt={result.alt}
+              />
+            </Suspense>
+          </div>
           ))
         }
       </CommonDrawer>

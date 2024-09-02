@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['img.aeonretail.com']
+    remotePatterns: [
+      {
+        hostname: '**',
+        protocol: 'https'
+      }
+    ]
   }
 };
 
