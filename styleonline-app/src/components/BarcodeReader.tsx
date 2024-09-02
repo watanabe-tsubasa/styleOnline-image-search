@@ -85,7 +85,7 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
 
   return (
     <div className='flex flex-col space-y-4'>
-      <div className='flex items-center w-full h-32 overflow-hidden'>
+      <div className={scanStyle}>
         <Webcam
           className='w-auto'
           audio={false}
