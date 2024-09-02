@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, lazy, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -34,6 +34,8 @@ import { CommonDialog } from "@/components/CommonDialog"
 import { CommonDrawer } from "@/components/CommonDrawer"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "./ui/label"
+import { Skeleton } from "./ui/skeleton"
+const LazyImage = lazy(() => import('@/components/LazyImage'))
 interface searchResultsType {
   id: number;
   url: string;
@@ -120,19 +122,18 @@ export default function MainCard() {
         dialogTrigger={<Button variant="outline">{`${target}をスキャン`}</Button>}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        dialogChildren={
-          <div>
-            <BarcodeReader 
-              setBarcode={setJanCode}
-              isScanning={isModalOpen}
-              setIsScanning={setIsModalOpen}
-              open={isModalOpen}
-              setOpen={setIsModalOpen}
-              isQRMode={isQRMode}
-            />
-          </div>
-        }
-      />
+      >
+        <div>
+          <BarcodeReader 
+            setBarcode={setJanCode}
+            isScanning={isModalOpen}
+            setIsScanning={setIsModalOpen}
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            isQRMode={isQRMode}
+          />
+        </div>
+      </CommonDialog>
 
       <CommonDrawer
         drawerTitle="画像検索結果"
@@ -141,20 +142,18 @@ export default function MainCard() {
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
         statusMessage={statusMessage}
-        drawerChildren={
-          searchResults.map((result) => (
-            <div key={result.id}>
-              <img
-                src={result.url}
-                alt={result.alt}
-                width={150}
-                height={150}
-                className="rounded-md"
-              />
-            </div>
+      >
+        {searchResults.map((result) => (
+          <Suspense fallback={<Skeleton className="rounded-md aspect-square" />}>
+            <LazyImage
+             key={result.id}
+             src={result.url}
+             alt={result.alt}
+            />
+          </Suspense>
           ))
         }
-      />
+      </CommonDrawer>
     </div>
   )
 }
