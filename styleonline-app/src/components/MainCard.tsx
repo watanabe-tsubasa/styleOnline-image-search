@@ -47,7 +47,7 @@ export default function MainCard() {
   const [searchResults, setSearchResults] = useState<searchResultsType[]>([])
   const [janCode, setJanCode] = useState("")
   const [statusMessage, setStatusMessage] = useState<string>('');
-  const [isQRMode, setIsQRMode] = useState<boolean>(false);
+  const [isQRMode, setIsQRMode] = useState<boolean>(true);
   
   const target = isQRMode ? 'QRコード': 'JANコード';
 
