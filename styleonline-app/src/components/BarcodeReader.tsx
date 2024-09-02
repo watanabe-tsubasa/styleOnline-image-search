@@ -84,7 +84,7 @@ export const BarcodeReader: React.FC<BarcodeReaderProps> = ({
     //   setIsScanning(false);
     // };
   // 依存性配列にsetBarcodeとsetIsScanningを追加
-  }, [isScanning, setBarcode, setIsScanning]);
+  }, [isScanning, setBarcode, setIsScanning, isQRMode]);
 
   return (
     <div className='flex flex-col space-y-4 items-center'>

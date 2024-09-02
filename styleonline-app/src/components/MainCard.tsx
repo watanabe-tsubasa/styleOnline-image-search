@@ -143,9 +143,8 @@ export default function MainCard() {
         statusMessage={statusMessage}
         drawerChildren={
           searchResults.map((result) => (
-            <div>
+            <div key={result.id}>
               <img
-                key={result.id}
                 src={result.url}
                 alt={result.alt}
                 width={150}
