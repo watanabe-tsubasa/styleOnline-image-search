@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -23,9 +23,13 @@ export default function MainCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [janCode, setJanCode] = useState("")
+  const [searchJanCode, setSearchJanCode] = useState("4580688635054")
   const [isQRMode, setIsQRMode] = useState<boolean>(true);
   
   const target = isQRMode ? 'QRコード': 'JANコード';
+  useEffect(() => {
+    setSearchJanCode(janCode);
+  },[janCode])
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 space-y-4">
@@ -99,8 +103,7 @@ export default function MainCard() {
           </div>
           }
         >
-          
-          <SearchDrawerBody query={janCode} />
+          <SearchDrawerBody query={searchJanCode} />
         </Suspense>
       </CommonDrawer>
     </div>

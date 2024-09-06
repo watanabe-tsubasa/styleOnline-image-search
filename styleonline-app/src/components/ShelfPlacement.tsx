@@ -16,8 +16,11 @@ const fetcher = (janCode: string) =>
   
 
 const useShelf = (janCode: string) => {
-  console.log('fetching')
-  const { data, error } = useSWR<shelfAPIResponseType>(janCode, fetcher, { suspense: true });
+  const { data, error } = useSWR<shelfAPIResponseType>(
+    janCode ? ['api/shelf', janCode]: null,
+    ([, janCode]) => fetcher(janCode as string),
+    { suspense: true }
+  );
   return { data, isError: error };
 }
 
