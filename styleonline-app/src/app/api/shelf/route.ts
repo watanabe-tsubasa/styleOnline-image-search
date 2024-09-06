@@ -14,7 +14,7 @@ export type shelfAPIResponseType = shelfObj[];
 const fetcher = async (janCode: string): Promise<shelfAPIResponseType> => {
   try {
     let res = await fetch(`${apiURL}?janCode=${janCode}`, {
-      redirect: 'manual', // 手動でリダイレクト処理を行う
+      redirect: 'manual',
     });
 
     // リダイレクトされているか確認
