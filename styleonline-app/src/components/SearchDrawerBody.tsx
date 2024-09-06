@@ -21,7 +21,11 @@ const fetcher = (query: string) =>
   }).then(res => res.json());
 
 const useGsearch = (query: string) => {
-  const { data, error } = useSWR<gsearchAPIResponse>(query, fetcher, { suspense: true });
+  const { data, error } = useSWR<gsearchAPIResponse>(
+    query ? ['/api/gsearch', query]: null,
+    ([, query]) => fetcher(query as string),
+    { suspense: true }
+  );
   return { data, isError: error };
 };
 

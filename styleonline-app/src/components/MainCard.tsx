@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -14,17 +14,22 @@ import { DynamicImage } from "@/components/atoms/DynamicImage"
 import { CommonDialog } from "@/components/atoms/CommonDialog"
 import { CommonDrawer } from "@/components/atoms/CommonDrawer"
 import { Switch } from "@/components/ui/switch"
-import { Label } from "./ui/label"
+import { Label } from "@/components/ui/label"
 import { SearchDrawerBody } from "./SearchDrawerBody"
-import { Skeleton } from "./ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
+import { ShelfPlacement } from "./ShelfPlacement"
 
 export default function MainCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [janCode, setJanCode] = useState("")
+  const [searchJanCode, setSearchJanCode] = useState("4580688635054")
   const [isQRMode, setIsQRMode] = useState<boolean>(true);
   
   const target = isQRMode ? 'QRコード': 'JANコード';
+  useEffect(() => {
+    setSearchJanCode(janCode);
+  },[janCode])
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 space-y-4">
@@ -55,6 +60,7 @@ export default function MainCard() {
             height={400}
             altText="商品画像"
           />
+          <ShelfPlacement janCode={janCode} />
         </CardContent>
       </Card>
 
@@ -97,8 +103,7 @@ export default function MainCard() {
           </div>
           }
         >
-          
-          <SearchDrawerBody query={janCode} />
+          <SearchDrawerBody query={searchJanCode} />
         </Suspense>
       </CommonDrawer>
     </div>
