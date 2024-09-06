@@ -14,9 +14,10 @@ import { DynamicImage } from "@/components/atoms/DynamicImage"
 import { CommonDialog } from "@/components/atoms/CommonDialog"
 import { CommonDrawer } from "@/components/atoms/CommonDrawer"
 import { Switch } from "@/components/ui/switch"
-import { Label } from "./ui/label"
+import { Label } from "@/components/ui/label"
 import { SearchDrawerBody } from "./SearchDrawerBody"
-import { Skeleton } from "./ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
+import { ShelfPlacement } from "./ShelfPlacement"
 
 export default function MainCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -55,6 +56,7 @@ export default function MainCard() {
             height={400}
             altText="商品画像"
           />
+          <ShelfPlacement janCode={janCode} />
         </CardContent>
       </Card>
 
